@@ -5,15 +5,18 @@
 
 using namespace std;
 
+//A struct containing each color channel, used as part of a canvas to be saved into a bitmap.
 struct rgb_data { float r, g, b, a; };
 
-void save_bitmap(const char * file_name, int width, int height, int dpi, rgb_data ** pixel_data)
+//A function that saves a bitmap based on given parameters
+void save_bitmap(const char * file_name, int width, int height, rgb_data ** pixel_data)
 {
-	FILE *image;
-	int image_size = width * height;
-	int file_size = 54 + 4 * image_size;
-	int ppm = dpi * 39.375;
+	FILE *image;//create a file that will be written to later
+	int image_size = width * height;//Find the size of the image
+	int file_size = 54 + 4 * image_size;//find the size of the file
+	int ppm = 96 * 39.375;//find the pixels per meter (multiply dpi by a constant)
 
+	//The basic file header for a file.  Determines what kind of file it is and how large it is.  Is 14 bytes large.
 	struct bitmap_file_header {
 		unsigned char bitmap_type[2];
 		int file_size;
@@ -22,22 +25,23 @@ void save_bitmap(const char * file_name, int width, int height, int dpi, rgb_dat
 		unsigned int offset_bits;
 	} bfh;
 
+	//The file header specific to a bitmap.  Is 40 bytes large.
 	struct bitmap_image_header {
-		unsigned int size_header;
-		unsigned int width;
-		unsigned int height;
-		short int planes;
-		short int bit_count;
-		unsigned int compression;
-		unsigned int image_size;
-		unsigned int ppm_x;
-		unsigned int ppm_y;
-		unsigned int clr_used;
-		unsigned int clr_important;
+		unsigned int size_header;//the size of this header
+		unsigned int width;//the width of the image
+		unsigned int height;//the height of the image
+		short int planes;//how many planes the image has
+		short int bit_count;//how large each pixel is in bits (32 in this case due to 4 channel unsigned chars (0-255 range times 4))
+		unsigned int compression;//different compression modes, leaving it at 0 because I don't want to mess with that.
+		unsigned int image_size;//how large the file is
+		unsigned int ppm_x;//pixels per meter on the x scale
+		unsigned int ppm_y;//pixels per meter on the y scale
+		unsigned int clr_used;//color table, used to decrease file size
+		unsigned int clr_important;//same as above.  Not messing with this.
 	} bih;
 
-	memcpy(&bfh.bitmap_type, "BM", 2);
-	bfh.file_size = file_size;
+	memcpy(&bfh.bitmap_type, "BM", 2);//populate the appropriate values to the appropriate slots in the structs.
+	bfh.file_size = file_size;//don't mess with these unless you know exactly what you're doing.
 	bfh.reserved1 = 0;
 	bfh.reserved2 = 0;
 	bfh.offset_bits = 0;
@@ -54,33 +58,33 @@ void save_bitmap(const char * file_name, int width, int height, int dpi, rgb_dat
 	bih.clr_used = 0;
 	bih.clr_important = 0;
 
-	image = fopen(file_name, "wb");
+	image = fopen(file_name, "wb");//open the file.
 
-	fwrite(&bfh, 1, 14, image);
+	fwrite(&bfh, 1, 14, image);//write both headers into the file
 	fwrite(&bih, 1, sizeof(bih), image);
 
-	for (int i = height; i > -1; i--) {
-		for (int j = 0; j < width; j++) {
-			rgb_data BGR = pixel_data[j][i];
+	for (int i = height; i > -1; i--) {//for each pixel in the height of the canvas (starting from end of array to allow for standard upper-right-corner origin in computer graphics, something bitmaps don't do normally.)
+		for (int j = 0; j < width; j++) {//for each pixel in the width of the canvas
+			rgb_data BGR = pixel_data[j][i];//copy the color channels from the pixel array for easier logic
 
-			float red = (BGR.r);
+			float red = (BGR.r);//convert to raw values (bitmaps take bgra, not rgba).
 			float green = (BGR.g);
 			float blue = (BGR.b);
 			float alpha = (BGR.a);
 
-			unsigned char color[4] = {
+			unsigned char color[4] = {//convert to an array of unsigned chars in the format of BGRA
 			   blue, green, red, alpha
 			};
-			fwrite(color, 1, sizeof(color), image);
+			fwrite(color, 1, sizeof(color), image);//write pixel into file
 		}
 
 	}
 
-	fclose(image);
+	fclose(image);//finish image
 }
 
- rgb_data ** getBlankCanvas(int width, int height)
-{
+//This function creates a blank canvas of structs based on a given height and width
+rgb_data ** getBlankCanvas(int width, int height) {
 	struct rgb_data ** canvas = new rgb_data*[height];
 	for (int i = 0; i < height; i++) {
 		canvas[i] = new rgb_data[width];
@@ -89,10 +93,10 @@ void save_bitmap(const char * file_name, int width, int height, int dpi, rgb_dat
 	return canvas;
 }
 
+//The main function; used for manipulating the canvas and directing the program.
 int main() {
-	int width = 255;
+	int width = 256;
 	int height = 256;
-	int dpi = 96;
 
 	struct rgb_data **pixels = getBlankCanvas(width, height);
 
@@ -105,6 +109,6 @@ int main() {
 		}
 	}
 
-	save_bitmap("simple gradiant.bmp", width, height, dpi, pixels);
+	save_bitmap("simple gradiant.bmp", width, height, pixels);
 	return 0;
 }
