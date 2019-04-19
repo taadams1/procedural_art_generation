@@ -4,11 +4,20 @@
 #include <fstream>
 #include <iostream>
 #include <cstdio>
+#include <chrono>
+#include <string>
+#include <stdlib.h>
+#include <cmath>
+
+#include "Draw.h"
+#include "FractalSquare.h"
+#include "RandomLines.h"
+#include "RandomPixels.h"
 
 using namespace std;
 
 //A struct containing each color channel, used as part of a canvas to be saved into a bitmap.
-struct rgb_data { float r, g, b, a; };
+//struct rgb_data { float r, g, b, a; };
 
 //A function that saves a bitmap based on given parameters
 void save_bitmap(const char * file_name, int width, int height, rgb_data ** pixel_data)
@@ -85,104 +94,6 @@ void save_bitmap(const char * file_name, int width, int height, rgb_data ** pixe
 	fclose(image);//finish image
 }
 
-//Base sourced from https://www.thecrazyprogrammer.com/2017/01/dda-line-drawing-algorithm-c-c.html
-void drawLine(rgb_data color, int x1, int y1, int x2, int y2, rgb_data ** canvas){
-	int swap = 0;
-	if(x1 > x2){
-		swap = x1;
-		x1 = x2;
-		x2 = swap;
-		swap = y1;
-		y1 = y2;
-		y2 = swap;
-	}
-	if(x1 == x2 && y1 > y2){
-		swap = y1;
-		y1 = y2;
-		y2 = swap;
-	}
-	float dx = 1.0*(x2 - x1);
-	float dy = 1.0*(y2 - y1);
-	float length = 0;
-	int i = 0;
-	
-	if(dx >= dy){
-		length = dx;
-	}else{
-		length = dy;
-	}
-	
-	dx = dx/length;
-	dy = dy/length;
-	
-	float x = x1;
-	float y = y1;
-	
-	for(int i = 0; i < length; i++){
-		canvas[(int)x][(int)y] = color;
-		x += dx;
-		y += dy;
-	}
-}
-
-//base sourced from https://www.thecrazyprogrammer.com/2016/12/bresenhams-midpoint-circle-algorithm-c-c.html
-void drawCircle(rgb_data color, int xCenter, int yCenter, int radius, rgb_data ** canvas){
-	int x = radius;
-	int y = 0;
-	int err = 0;
-	while(x >= y){
-		canvas[xCenter + x][yCenter + y] = color;
-		canvas[xCenter + y][yCenter + x] = color;
-		canvas[xCenter - x][yCenter + y] = color;
-		canvas[xCenter - y][yCenter + x] = color;
-		canvas[xCenter - x][yCenter - y] = color;
-		canvas[xCenter - y][yCenter - x] = color;
-		canvas[xCenter + x][yCenter - y] = color;
-		canvas[xCenter + y][yCenter - x] = color;
-		
-		if(err <= 0){
-			y+= 1;
-			err += 2*y + 1;
-		}
-		
-		if(err > 0){
-			x -= 1;
-			err -= 2*x + 1;
-		}
-	}
-}
-
-void drawRectangle(rgb_data color, int x1, int y1, int x2, int y2, bool fill, rgb_data ** canvas){
-	int swap = 0;
-	if(x1 < x2 && y1 > y2){
-		swap = y1;
-		y1 = y2;
-		y2 = swap;
-	}
-	if(x1 > x2 && y1 < y2){
-		swap = y1;
-		y1 = y2;
-		y2 = swap;
-	}
-	if(x1 > x2 && y1 > y2){
-		swap = x1;
-		x1 = x2;
-		x2 = swap;
-		swap = y1;
-		y1 = y2;
-		y2 = swap;
-	}
-	drawLine(color, x1, y1, x2, y1, canvas);
-	drawLine(color, x2, y1, x2, y2, canvas);
-	drawLine(color, x2, y2, x1, y2, canvas);
-	drawLine(color, x1, y2, x1, y1, canvas);
-	if(fill){
-		for(int i = 0; i < (y2 - y1); i++){
-			drawLine(color, x1, y1+i, x2, y1+i, canvas);
-		}
-	}
-}
-
 //This function creates a blank canvas of structs based on a given height and width
 rgb_data ** getBlankCanvas(int width, int height) {
 	struct rgb_data ** canvas = new rgb_data*[height];
@@ -193,7 +104,11 @@ rgb_data ** getBlankCanvas(int width, int height) {
 	return canvas;
 }
 
-void runTest(){
+int randRBG() {
+	return rand() % 256;
+}
+
+void runTest() {
 	int width = 256;
 	int height = 256;
 
@@ -207,65 +122,220 @@ void runTest(){
 			pixels[x][y].a = 128;
 		}
 	}
-	
+
 	rgb_data color;
 	color.a = 255;
 	color.r = 0;
 	color.g = 0;
 	color.b = 0;
-	
-	drawLine(color, 0, 0, 255, 255, pixels);
-	drawLine(color, 0, 128, 256, 128, pixels);
-	drawLine(color, 0, 256, 256, 0, pixels);
-	drawLine(color, 128, 0, 128, 256, pixels);
-	drawCircle(color, 128, 128, 5, pixels);
-	drawCircle(color, 128, 128, 10, pixels);
-	drawCircle(color, 128, 128, 15, pixels);
-	drawCircle(color, 128, 128, 20, pixels);
-	drawCircle(color, 128, 128, 25, pixels);
-	drawCircle(color, 128, 128, 30, pixels);
-	drawCircle(color, 128, 128, 35, pixels);
-	drawRectangle(color, 0, 0, 64, 64, true, pixels);
-	drawRectangle(color, 0, 255, 64, 192, true, pixels);
-	drawRectangle(color, 255, 0, 192, 64, true, pixels);
-	drawRectangle(color, 255, 255, 192, 192, true, pixels);
-	drawRectangle(color, 64, 64, 192, 192, false, pixels);
+
+	Draw::drawLine(color, 0, 0, 255, 255, pixels);
+	Draw::drawLine(color, 0, 128, 256, 128, pixels);
+	Draw::drawLine(color, 0, 256, 256, 0, pixels);
+	Draw::drawLine(color, 128, 0, 128, 256, pixels);
+	Draw::drawCircle(color, 128, 128, 5, pixels);
+	Draw::drawCircle(color, 128, 128, 10, pixels);
+	Draw::drawCircle(color, 128, 128, 15, pixels);
+	Draw::drawCircle(color, 128, 128, 20, pixels);
+	Draw::drawCircle(color, 128, 128, 25, pixels);
+	Draw::drawCircle(color, 128, 128, 30, pixels);
+	Draw::drawCircle(color, 128, 128, 35, pixels);
+	Draw::drawRectangle(color, 0, 0, 64, 64, true, pixels);
+	Draw::drawRectangle(color, 0, 255, 64, 192, true, pixels);
+	Draw::drawRectangle(color, 255, 0, 192, 64, true, pixels);
+	Draw::drawRectangle(color, 255, 255, 192, 192, true, pixels);
+	Draw::drawRectangle(color, 64, 64, 192, 192, false, pixels);
 
 	save_bitmap("Test Image.bmp", width, height, pixels);
+}
+
+void runTest2() {
+	int width = 1024;
+	int height = 1024;
+
+	struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+	for (int y = 0; y < width; y++) {
+		for (int x = 0; x < height; x++) {
+			pixels[x][y].r = 255;
+			pixels[x][y].g = 255;
+			pixels[x][y].b = 255;
+			pixels[x][y].a = 255;
+		}
+	}
+
+	rgb_data color;
+	color.a = 64;
+	color.r = 0;
+	color.g = 0;
+	color.b = 0;
+
+	pixels = FractalSquare::drawFractalSquare(width, color, pixels);
+
+	save_bitmap("Test Fractal.bmp", width, height, pixels);
+}
+
+void runTest3() {
+	int width = 1024;
+	int height = 1024;
+
+	struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+	for (int y = 0; y < width; y++) {
+		for (int x = 0; x < height; x++) {
+			pixels[x][y].r = 255;
+			pixels[x][y].g = 255;
+			pixels[x][y].b = 255;
+			pixels[x][y].a = 255;
+		}
+	}
+
+	rgb_data color;
+	color.a = 255;
+	color.r = 255;
+	color.g = 0;
+	color.b = 0;
+
+	pixels = FractalSquare::drawFractalSquare(width, color, pixels);
+
+	save_bitmap("Test Fractal x 3 1st.bmp", width, height, pixels);
+
+	color.a = 255;
+	color.r = 0;
+	color.g = 255;
+	color.b = 0;
+
+	pixels = FractalSquare::drawFractalSquare(width, color, pixels);
+
+	save_bitmap("Test Fractal x 3 2nd.bmp", width, height, pixels);
+
+	color.a = 255;
+	color.r = 0;
+	color.g = 0;
+	color.b = 255;
+
+	pixels = FractalSquare::drawFractalSquare(width, color, pixels);
+
+
+	save_bitmap("Test Fractal x 3 3rd.bmp", width, height, pixels);
+}
+
+void runTest4() {
+
+	int width = 1024;
+	int height = 1024;
+
+	struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+	for (int y = 0; y < width; y++) {
+		for (int x = 0; x < height; x++) {
+			pixels[x][y].r = 255;
+			pixels[x][y].g = 255;
+			pixels[x][y].b = 255;
+			pixels[x][y].a = 255;
+		}
+	}
+
+	rgb_data color;
+	color.a = 255;
+	color.r = 0;
+	color.g = 0;
+	color.b = 0;
+
+	pixels = RandomLines::randomLines(width, 10000, color, pixels);
+
+	save_bitmap("Test RndmLines 1k.bmp", width, height, pixels);
+
+}
+
+void runTest5() {
+
+	int width = 1024;
+	int height = 1024;
+
+	struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+	pixels = RandomPixels::randomPixels(width,pixels);
+
+	save_bitmap("RandomPixels.bmp", width, height, pixels);
+
+}
+
+void runTest6() {
+
+	int width = 1024;
+	int height = 1024;
+
+	struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+	pixels = RandomPixels::randomPixels(width, pixels);
+	rgb_data color;
+	color.a = 255;
+	color.r = 64;
+	color.g = 64;
+	color.b = 64;
+	pixels = FractalSquare::drawFractalSquare(width, color, pixels);
+
+	save_bitmap("RandomPixelsFractalSquare.bmp", width, height, pixels);
+
 }
 
 //The main function; used for manipulating the canvas and directing the program.
 int main() {
 	bool quits = false;
 	int input = -1;
-	
-	while(!quits){
+
+	while (!quits) {
 		input = -1;
 		cout << endl << "Main Menu: " << endl;
 		cout << "\t[0]: Quit" << endl;
 		cout << "\t[1]: Run Test" << endl;
-		
+		cout << "\t[2]: Fractal Squares" << endl;
+		cout << "\t[3]: Fractal Squares * 3" << endl;
+		cout << "\t[4]: Random Lines" << endl;
+		cout << "\t[5]: Random Pixels" << endl;
+		cout << "\t[6]: Random Pixels + Fractal Squares" << endl;
+
 		cout << endl << "Please enter the number of a choice above: ";
 		cin >> input;
-		if(input > 1 || input < 0){
+		if (input > 6 || input < 0) {
 			cout << "Invalid input; please try again.";
 			input = -1;
 		}
-		
-		switch(input){
-			case 0: 
-				quits = true;
-				break;
-			case 1:
-				cout << endl << "Running test" << endl;
-				runTest();
-				cout << "Test image completed; saved as 'TestImage.bmp'" << endl;
-				break;
-			default:
-				break;
+
+		switch (input) {
+		case 0:
+			quits = true;
+			break;
+		case 1:
+			cout << endl << "Running test" << endl;
+			runTest();
+			cout << "Test image completed; saved as 'TestImage.bmp'" << endl;
+			break;
+		case 2:
+			cout << endl << "Running Fractal Squares" << endl;
+			runTest2();
+			break;
+		case 3:
+			cout << endl << "Running Fractal Squares * 3" << endl;
+			runTest3();
+			break;
+		case 4:
+			cout << endl << "Running Random Lines" << endl;
+			runTest4();
+			break;
+		case 5:
+			cout << endl << "Running Random Pixels" << endl;
+			runTest5();
+			break;
+		case 6:
+			cout << endl << "Random Pixels + Fractal Squares" << endl;
+			runTest6();
+		default:
+			break;
 		}
 	}
-	
-	runTest();
+
+	//runTest();
 	return 0;
 }
