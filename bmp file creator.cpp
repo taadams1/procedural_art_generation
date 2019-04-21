@@ -13,6 +13,7 @@
 #include "FractalSquare.h"
 #include "RandomLines.h"
 #include "RandomPixels.h"
+#include "LineWalk.h"
 
 using namespace std;
 
@@ -250,14 +251,26 @@ void runTest4() {
 
 void runTest5() {
 
-	int width = 1024;
-	int height = 1024;
+	int width = 256;
+	int height = 256;
 
 	struct rgb_data ** pixels = getBlankCanvas(width, height);
 
 	pixels = RandomPixels::randomPixels(width,pixels);
 
 	save_bitmap("RandomPixels.bmp", width, height, pixels);
+
+	pixels = getBlankCanvas(width, height);
+
+	pixels = RandomPixels::randomPixels2(width, pixels);
+
+	save_bitmap("RandomPixels2.bmp", width, height, pixels);
+
+	pixels = getBlankCanvas(width, height);
+
+	pixels = RandomPixels::randomPixels3(width, pixels);
+
+	save_bitmap("RandomPixels3.bmp", width, height, pixels);
 
 }
 
@@ -280,6 +293,43 @@ void runTest6() {
 
 }
 
+void runTest7() {
+
+	int width = 1024;
+	int height = 1024;
+
+	int shift = 2;
+	int iterations = 500;
+
+	for (int i = 0; i < 5; i++) {
+
+		struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+		for (int y = 0; y < width; y++) {
+			for (int x = 0; x < height; x++) {
+				pixels[x][y].r = 255;
+				pixels[x][y].g = 255;
+				pixels[x][y].b = 255;
+				pixels[x][y].a = 255;
+			}
+		}
+
+		int lines[2][4] = { {500,64,500,960},{524,64,524,960} };
+
+		pixels = LineWalk::lineWalk(lines, width, shift, iterations, pixels);
+
+		std::string filestring = "Line_Walk_" + to_string(i + 1) + ".bmp";
+
+		const char *filename = filestring.c_str();
+
+		save_bitmap(filename, width, height, pixels);
+
+		shift *= 2;
+		iterations *= 2;
+	}
+
+}
+
 //The main function; used for manipulating the canvas and directing the program.
 int main() {
 	bool quits = false;
@@ -295,10 +345,11 @@ int main() {
 		cout << "\t[4]: Random Lines" << endl;
 		cout << "\t[5]: Random Pixels" << endl;
 		cout << "\t[6]: Random Pixels + Fractal Squares" << endl;
+		cout << "\t[7]: Line Walk" << endl;
 
 		cout << endl << "Please enter the number of a choice above: ";
 		cin >> input;
-		if (input > 6 || input < 0) {
+		if (input > 7 || input < 0) {
 			cout << "Invalid input; please try again.";
 			input = -1;
 		}
@@ -331,6 +382,11 @@ int main() {
 		case 6:
 			cout << endl << "Random Pixels + Fractal Squares" << endl;
 			runTest6();
+			break;
+		case 7:
+			cout << endl << "Running Line Walk" << endl;
+			runTest7();
+			break;
 		default:
 			break;
 		}

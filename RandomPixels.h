@@ -8,13 +8,14 @@
 class RandomPixels
 {
 public:
+	//this function creates a completely random color for each pixel on the canvas
 	static rgb_data ** randomPixels(int size, rgb_data ** canvas) {
 
 		for (int y = 0; y < size; y++) {
 			for (int x = 0; x < size; x++) {
-				canvas[x][y].r = randRBG();
-				canvas[x][y].g = randRBG();
-				canvas[x][y].b = randRBG();
+				canvas[x][y].r = Color::randomRGBVal();
+				canvas[x][y].g = Color::randomRGBVal();
+				canvas[x][y].b = Color::randomRGBVal();
 				canvas[x][y].a = 255;
 			}
 		}
@@ -22,62 +23,93 @@ public:
 		return canvas;
 	}
 
-	/*int colorAvg1 = 1.0;
+	//this function uses a color average to alter random colors place at each pixel on the canvas
+	static rgb_data ** randomPixels2(int size, rgb_data ** canvas) {
 
-	function createImage2() {
+		double colorAvg1 = 1.0;
 
 		for (int x = 0; x < size; x++) {
 
 			for (int y = 0; y < size; y++) {
 
-				int pixelIndex = (y * size + x) * 4;
+				//set to random colors altered by color average variable
+				int redVal = Color::randomRGBVal() * colorAvg1;
+				int greenVal = Color::randomRGBVal() * colorAvg1;
+				int blueVal = Color::randomRGBVal() * colorAvg1;
+				canvas[x][y].r = redVal;
+				canvas[x][y].g = greenVal;
+				canvas[x][y].b = blueVal;
+				canvas[x][y].a = 255;
 
-				int redVal = randomRGBVal() * colorAvg1; int greenVal = randomRGBVal() * colorAvg1;
-				int blueVal = randomRGBVal() * colorAvg1;
-				imageData2.data[pixelIndex] = redVal;
-				imageData2.data[pixelIndex + 1] = greenVal;
-				imageData2.data[pixelIndex + 2] = blueVal;
-				imageData2.data[pixelIndex + 3] = 255;
-
+				//get color average and alter based on range
 				colorAvg1 = (redVal + greenVal + blueVal) / 3 / 127.5;
 				if (colorAvg1 < 0.5) { colorAvg1 += 0.4; }
 				else if (colorAvg1 > 1.5) { colorAvg1 -= 0.4; }
 			}
 		}
 
-		context2.putImageData(imageData2, 0, 0);
+		return canvas;
 	}
 
-	function createImage3() {
+	//this function creates 4x4 'pixels' of random color
+	static rgb_data ** randomPixels3(int size, rgb_data ** canvas) {
 
 		for (int x = 0; x < size;) {
 
 			for (int y = 0; y < size;) {
 
-				int redVal = randomRGBVal();
-				int greenVal = randomRGBVal();
-				int blueVal = randomRGBVal();
+				//set the color values before looping over large 'pixel'
+				int redVal = Color::randomRGBVal();
+				int greenVal = Color::randomRGBVal();
+				int blueVal = Color::randomRGBVal();
 
+				//iterate over 4x4 area to create large 'pixel'
 				for (int a = x; a < x + 4; a++) {
 
 					for (int b = y; b < y + 4; b++) {
 
-						int pixelIndex = (a * size + b) * 4;
-
-						imageData3.data[pixelIndex] = redVal;
-						imageData3.data[pixelIndex + 1] = greenVal;
-						imageData3.data[pixelIndex + 2] = blueVal;
-						imageData3.data[pixelIndex + 3] = 255;
+						canvas[a][b].r = redVal;
+						canvas[a][b].g = greenVal;
+						canvas[a][b].b = blueVal;
+						canvas[a][b].a = 255;
 
 					}
 				} y += 4;
 			}x += 4;
 		}
 
-		context3.putImageData(imageData3, 0, 0);
+		return canvas;
 	}
 
-	int colorAvg2 = 0.0;
+	static rgb_data ** randomPixels3Error(int size, rgb_data ** canvas) {
+
+		for (int x = 0; x < size;) {
+
+			for (int y = 0; y < size;) {
+
+				int redVal = Color::randomRGBVal();
+				int greenVal = Color::randomRGBVal();
+				int blueVal = Color::randomRGBVal();
+
+				for (int a = x; a < x + 4; a++) {
+
+					for (int b = y; b < y + 4; b++) {
+
+						canvas[x][y].r = redVal;
+						canvas[x][y].g = greenVal;
+						canvas[x][y].b = blueVal;
+						canvas[x][y].a = 255;
+
+					}
+				} y += 4;
+			}x += 4;
+		}
+
+		return canvas;
+	}
+
+
+	/*int colorAvg2 = 0.0;
 
 	function createImage4() {
 

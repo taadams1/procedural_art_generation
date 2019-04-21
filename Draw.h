@@ -1,7 +1,6 @@
 #pragma once
 
-//A struct containing each color channel, used as part of a canvas to be saved into a bitmap.
-struct rgb_data { float r, g, b, a; };
+#include "Color.h"
 
 class Draw
 {
@@ -41,7 +40,7 @@ public:
 		float y = y1;
 
 		for (int i = 0; i < length; i++) {
-			canvas[(int)x][(int)y] = color;
+			canvas[(int)x][(int)y] = Color::mixAlpha(canvas[(int)x][(int)y], color);
 			x += dx;
 			y += dy;
 		}
