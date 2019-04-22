@@ -1,65 +1,8 @@
 ﻿#include "FractalSquare.h"
 
 
-
-FractalSquare::FractalSquare()
-{
-}
-
-
-FractalSquare::~FractalSquare()
-{
-}
-
 //initialize fractal square, create generation string, decode string and
 //draw squares at the appropriate size and location
-void FractalSquare::drawFractalSquare(int size, vector<vector<wchar_t>> &vec) {
-
-	const int DEPTH = 6;
-
-	srand(time(0));
-
-	wstring output = generateString(DEPTH);
-
-	int currentSize;
-	int currentDepth = 0;
-	int xPos = 0;
-	int yPos = 0;
-
-	for (int i = 0; i < output.length(); i++) {
-
-		char p = output[i];
-		currentSize = size / pow(2, currentDepth);
-
-
-		switch (p)
-		{
-		case 'X':
-			drawFS(vec, xPos, yPos, xPos + currentSize, yPos + currentSize);
-			break;
-		case '[':
-			currentDepth++;
-			break;
-		case ']':
-			xPos -= currentSize;
-			yPos -= currentSize;
-			currentDepth--;
-			break;
-		case '-':
-			xPos += currentSize;
-			break;
-		case '/':
-			xPos -= currentSize;
-			yPos += currentSize;
-			break;
-		default:
-			break;
-		}
-
-	}
-
-}
-
 rgb_data ** FractalSquare::drawFractalSquare(int size, rgb_data color, rgb_data ** canvas)
 {
 	const int DEPTH = 8;
@@ -107,6 +50,73 @@ rgb_data ** FractalSquare::drawFractalSquare(int size, rgb_data color, rgb_data 
 	return canvas;
 }
 
+//initialize fractal square, create generation string, decode string and
+//draw squares at the appropriate size and location, with a chance of drawing a circle
+rgb_data ** FractalSquare::drawFractalSquareWithCircles(int size, rgb_data color, rgb_data ** canvas)
+{
+	const int DEPTH = 8;
+
+	srand(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+
+	wstring output = generateString(DEPTH);
+
+	int currentSize;
+	int currentDepth = 0;
+	int xPos = 0;
+	int yPos = 0;
+
+	for (int i = 0; i < output.length(); i++) {
+
+		char p = output[i];
+		currentSize = size / pow(2, currentDepth);
+
+		//seed for generator
+		std::random_device rndm;
+		//seeded mersenne twister generator
+		std::mt19937 gen(rndm());
+		//range  distribution in which to generate integers
+		std::uniform_int_distribution<> dist(0, 3);
+
+		rgb_data cirClr = color;
+
+		cirClr.r = cirClr.r - 8;
+		cirClr.g = cirClr.g - 8;
+		cirClr.b = cirClr.b - 8;
+
+		int circleChance = dist(gen);
+		switch (p)
+		{
+		case 'X':
+			Draw::drawRectangle(color, xPos, yPos, xPos + currentSize - 2, yPos + currentSize - 2, true, canvas);
+
+			if (circleChance > 1 && currentDepth < 5) {
+				Draw::drawFilledCircle(cirClr, size, xPos + (currentSize / 2), yPos + (currentSize / 2), currentSize * 0.4, canvas);
+			}
+			break;
+		case '[':
+			currentDepth++;
+			break;
+		case ']':
+			xPos -= currentSize;
+			yPos -= currentSize;
+			currentDepth--;
+			break;
+		case '-':
+			xPos += currentSize;
+			break;
+		case '/':
+			xPos -= currentSize;
+			yPos += currentSize;
+			break;
+		default:
+			break;
+		}
+
+	}
+
+	return canvas;
+}
+
 
 
 //fractal square generated through the use of recursion,
@@ -123,9 +133,18 @@ wstring FractalSquare::generateString(int depth)
 		}
 		return L".";
 	}
+
 	// randomizer influenced by depth, squares are more likely
 	//to be present at smaller depths
-	int c = rand() % (11 + (depth * 8));
+
+	//seed for generator
+	std::random_device rndm;
+	//seeded mersenne twister generator
+	std::mt19937 gen(rndm());
+	//range  distribution in which to generate integers
+	std::uniform_int_distribution<> dist(0, 10 + (depth * 8));
+
+	int c = dist(gen);
 	if (c < 5) {
 		return L"X";
 	}
@@ -152,28 +171,4 @@ wstring FractalSquare::generateString(int depth)
 	output += L"]";
 
 	return output;
-}
-
-//output currently drawn with ascii characters
-void FractalSquare::drawFS(vector<vector<wchar_t>> &vec, int x1, int y1, int x2, int y2) {
-
-	for (int x = x1; x < x2; x++) {
-		for (int y = y1; y < y2; y++) {
-			vec[x][y] = L'█';
-		}
-	}
-
-}
-
-//prints ascii result of algorithm
-void FractalSquare::print(vector<vector<wchar_t>> &vec, int x, int y)
-{
-	_setmode(_fileno(stdout), _O_U16TEXT);
-
-	for (int i = 0; i < x; ++i) {
-		for (int j = 0; j < y; ++j) {
-			wcout << vec[i][j];
-		}
-		wcout << endl;
-	}
 }

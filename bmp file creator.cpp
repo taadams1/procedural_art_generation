@@ -14,11 +14,20 @@
 #include "RandomLines.h"
 #include "RandomPixels.h"
 #include "LineWalk.h"
+#include "CirclePacking.h"
+
+const rgb_data WHITE{ 255, 255, 255, 255 };
+const rgb_data BLACK = { 0, 0, 0, 0 };
+const rgb_data RED = { 255, 0, 0, 255 };
+const rgb_data GREEN = { 0, 255, 0, 255 };
+const rgb_data BLUE = { 0, 0, 255, 255 };
+const rgb_data YELLOW = { 255, 255, 0, 255 };
+const rgb_data MAGENTA = { 255, 0, 255, 255 };
+const rgb_data CYAN = { 0, 255, 255, 255 };
 
 using namespace std;
 
-//A struct containing each color channel, used as part of a canvas to be saved into a bitmap.
-//struct rgb_data { float r, g, b, a; };
+std::vector<circle> CirclePacking::circles; //pre-declaration of vector for circle pack functions
 
 //A function that saves a bitmap based on given parameters
 void save_bitmap(const char * file_name, int width, int height, rgb_data ** pixel_data)
@@ -75,7 +84,7 @@ void save_bitmap(const char * file_name, int width, int height, rgb_data ** pixe
 	fwrite(&bfh, 1, 14, image);//write both headers into the file
 	fwrite(&bih, 1, sizeof(bih), image);
 
-	for (int i = height; i > -1; i--) {//for each pixel in the height of the canvas (starting from end of array to allow for standard upper-right-corner origin in computer graphics, something bitmaps don't do normally.)
+	for (int i = height - 1; i > -1; i--) {//for each pixel in the height of the canvas (starting from end of array to allow for standard upper-right-corner origin in computer graphics, something bitmaps don't do normally.)
 		for (int j = 0; j < width; j++) {//for each pixel in the width of the canvas
 			rgb_data BGR = pixel_data[j][i];//copy the color channels from the pixel array for easier logic
 
@@ -191,32 +200,16 @@ void runTest3() {
 		}
 	}
 
-	rgb_data color;
-	color.a = 255;
-	color.r = 255;
-	color.g = 0;
-	color.b = 0;
-
-	pixels = FractalSquare::drawFractalSquare(width, color, pixels);
+	
+	pixels = FractalSquare::drawFractalSquare(width, Color::lessRandom(), pixels);
 
 	save_bitmap("Test Fractal x 3 1st.bmp", width, height, pixels);
 
-	color.a = 255;
-	color.r = 0;
-	color.g = 255;
-	color.b = 0;
-
-	pixels = FractalSquare::drawFractalSquare(width, color, pixels);
+	pixels = FractalSquare::drawFractalSquare(width, Color::lessRandom(), pixels);
 
 	save_bitmap("Test Fractal x 3 2nd.bmp", width, height, pixels);
 
-	color.a = 255;
-	color.r = 0;
-	color.g = 0;
-	color.b = 255;
-
-	pixels = FractalSquare::drawFractalSquare(width, color, pixels);
-
+	pixels = FractalSquare::drawFractalSquare(width, Color::lessRandom(), pixels);
 
 	save_bitmap("Test Fractal x 3 3rd.bmp", width, height, pixels);
 }
@@ -330,8 +323,173 @@ void runTest7() {
 
 }
 
+//fractal square with alpha test
+void runTest8() {
+	int width = 1024;
+	int height = 1024;
+
+	for (int i = 1; i <= 5; i++) {
+		struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+		rgb_data color = Color::lessRandom();
+
+		for (int y = 0; y < width; y++) {
+			for (int x = 0; x < height; x++) {
+				pixels[x][y] = color;
+			}
+		}
+
+		std::string filestring = "Fractal_Alpha_" + to_string(i) + "_1st.bmp";
+
+		const char *filename = filestring.c_str();
+
+		pixels = FractalSquare::drawFractalSquare(width, Color::lessRandomTransparent(), pixels);
+
+		save_bitmap(filename, width, height, pixels);
+
+		filestring = "Fractal_Alpha_" + to_string(i) + "_2nd.bmp";
+
+		filename = filestring.c_str();
+
+		pixels = FractalSquare::drawFractalSquare(width, Color::lessRandomTransparent(), pixels);
+
+		save_bitmap(filename, width, height, pixels);
+
+		filestring = "Fractal_Alpha_" + to_string(i) + "_3rd.bmp";
+
+		filename = filestring.c_str();
+
+		pixels = FractalSquare::drawFractalSquare(width, Color::lessRandomTransparent(), pixels);
+
+		save_bitmap(filename, width, height, pixels);
+
+	}
+}
+
+//fractal square with "less random" colors
+void runTest9() {
+	int width = 1024;
+	int height = 1024;
+
+	for (int i = 1; i <= 5; i++) {
+		struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+		rgb_data color = Color::lessRandom();
+
+		for (int y = 0; y < width; y++) {
+			for (int x = 0; x < height; x++) {
+				pixels[x][y] = color;
+			}
+		}
+
+		std::string filestring = "Fractal_LessRndm_" + to_string(i) + "_1st.bmp";
+
+		const char *filename = filestring.c_str();
+
+		pixels = FractalSquare::drawFractalSquare(width, Color::lessRandom(), pixels);
+
+		save_bitmap(filename, width, height, pixels);
+
+		filestring = "Fractal_LessRndm_" + to_string(i) + "_2nd.bmp";
+
+		filename = filestring.c_str();
+
+		pixels = FractalSquare::drawFractalSquare(width, Color::lessRandom(), pixels);
+
+		save_bitmap(filename, width, height, pixels);
+
+		filestring = "Fractal_LessRndm_" + to_string(i) + "_3rd.bmp";
+
+		filename = filestring.c_str();
+
+		pixels = FractalSquare::drawFractalSquare(width, Color::lessRandom(), pixels);
+
+		save_bitmap(filename, width, height, pixels);
+
+	}
+}
+
+
+void runTest10() {
+	int width = 1024;
+	int height = 1024;
+
+	struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+	for (int y = 0; y < width; y++) {
+		for (int x = 0; x < height; x++) {
+			pixels[x][y] = WHITE;
+		}
+	}
+
+	pixels = CirclePacking::packCircles(width, BLACK, pixels);
+
+	save_bitmap("CirclePackTest.bmp", width, height, pixels);
+}
+
+void runTest11() {
+	int width = 1024;
+	int height = 1024;
+
+	struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+	for (int y = 0; y < width; y++) {
+		for (int x = 0; x < height; x++) {
+			pixels[x][y] = WHITE;
+		}
+	}
+
+	pixels = CirclePacking::packFilledCircles(width, BLACK, pixels);
+
+	save_bitmap("FilledCirclePackTest.bmp", width, height, pixels);
+}
+
+//fractal square with circles test
+void runTest12() {
+	int width = 1024;
+	int height = 1024;
+
+	for (int i = 1; i <= 5; i++) {
+		struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+		rgb_data color = Color::lessRandom();
+
+		for (int y = 0; y < width; y++) {
+			for (int x = 0; x < height; x++) {
+				pixels[x][y] = color;
+			}
+		}
+
+		std::string filestring = "Fractal_Circles_" + to_string(i) + "_1st.bmp";
+
+		const char *filename = filestring.c_str();
+
+		pixels = FractalSquare::drawFractalSquare(width, Color::lessRandom(), pixels);
+
+		save_bitmap(filename, width, height, pixels);
+
+		filestring = "Fractal_Circles_" + to_string(i) + "_2nd.bmp";
+
+		filename = filestring.c_str();
+
+		pixels = FractalSquare::drawFractalSquare(width, Color::lessRandom(), pixels);
+
+		save_bitmap(filename, width, height, pixels);
+
+		filestring = "Fractal_Circles_" + to_string(i) + "_3rd.bmp";
+
+		filename = filestring.c_str();
+
+		pixels = FractalSquare::drawFractalSquareWithCircles(width, Color::lessRandom(), pixels);
+
+		save_bitmap(filename, width, height, pixels);
+
+	}
+}
+
 //The main function; used for manipulating the canvas and directing the program.
 int main() {
+
 	bool quits = false;
 	int input = -1;
 
@@ -346,10 +504,15 @@ int main() {
 		cout << "\t[5]: Random Pixels" << endl;
 		cout << "\t[6]: Random Pixels + Fractal Squares" << endl;
 		cout << "\t[7]: Line Walk" << endl;
+		cout << "\t[8]: Fractal With Alpha Test" << endl;
+		cout << "\t[9]: Fractal With Less Random Colors" << endl;
+		cout << "\t[10]: Circle Packing Test" << endl;
+		cout << "\t[11]: Filled Circle Packing Test" << endl << "\t\t^^^Warning: Very Slow!" << endl;
+		cout << "\t[12]: Fractal Squares With Circles" << endl;
 
 		cout << endl << "Please enter the number of a choice above: ";
 		cin >> input;
-		if (input > 7 || input < 0) {
+		if (input > 12 || input < 0) {
 			cout << "Invalid input; please try again.";
 			input = -1;
 		}
@@ -386,6 +549,26 @@ int main() {
 		case 7:
 			cout << endl << "Running Line Walk" << endl;
 			runTest7();
+			break;
+		case 8:
+			cout << endl << "Running Fractal with Alpha test" << endl;
+			runTest8();
+			break;
+		case 9:
+			cout << endl << "Running Fractal with Less Random Colors" << endl;
+			runTest9();
+			break;
+		case 10:
+			cout << endl << "Running Circle Packing test" << endl;
+			runTest10();
+			break;
+		case 11:
+			cout << endl << "Running Filled Circle Packing test" << endl;
+			runTest11();
+			break;
+		case 12:
+			cout << endl << "Running Fractal with Circle test" << endl;
+			runTest12();
 			break;
 		default:
 			break;

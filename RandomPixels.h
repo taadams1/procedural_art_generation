@@ -1,3 +1,5 @@
+//Random Pixels class by Trevor Adams
+
 #pragma once
 
 #include <cstdio>

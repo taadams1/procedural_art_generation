@@ -5,7 +5,7 @@ int Color::randomRGBVal()
 {
 	//seed for generator
 	std::random_device rndm;
-	//seeded mersenne twister generater
+	//seeded mersenne twister generator
 	std::mt19937 gen(rndm());
 	//range  distribution in which to generate integers
 	std::uniform_int_distribution<> dist(0, 255);
@@ -18,7 +18,7 @@ rgb_data Color::randomColor()
 {
 	//seed for generator
 	std::random_device rndm;
-	//seeded mersenne twister generater
+	//seeded mersenne twister generator
 	std::mt19937 gen(rndm());
 	//range  distribution in which to generate integers
 	std::uniform_int_distribution<> dist(0, 255);
@@ -43,6 +43,26 @@ rgb_data Color::lessRandom()
 	color.b = intervals[0];
 
 	color.a = 255;
+
+	return color;
+}
+
+rgb_data Color::lessRandomTransparent()
+{
+	std::vector<int> intervals = { 0,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,255 };
+
+	rgb_data color;
+
+	std::random_shuffle(intervals.begin(), intervals.end());
+	color.r = intervals[0];
+
+	std::random_shuffle(intervals.begin(), intervals.end());
+	color.g = intervals[0];
+
+	std::random_shuffle(intervals.begin(), intervals.end());
+	color.b = intervals[0];
+
+	color.a = 128;
 
 	return color;
 }

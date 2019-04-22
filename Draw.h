@@ -73,6 +73,148 @@ public:
 		}
 	}
 
+	static void drawCircleOffCanvas(rgb_data color, int canvasSize, int xCenter, int yCenter, int radius, rgb_data ** canvas) {
+		int x = radius;
+		int y = 0;
+		int err = 0;
+		while (x >= y) {
+			//if x&y are not out of bounds, draw circle
+			
+			if (inBounds(xCenter + x, canvasSize) && inBounds(yCenter + y, canvasSize)) {
+				canvas[xCenter + x][yCenter + y] = color;
+			}
+			if (inBounds(xCenter + y, canvasSize) && inBounds(yCenter + x, canvasSize)) {
+				canvas[xCenter + y][yCenter + x] = color;
+			}
+			if (inBounds(xCenter - x, canvasSize) && inBounds(yCenter + y, canvasSize)) {
+				canvas[xCenter - x][yCenter + y] = color;
+			}
+			if (inBounds(xCenter - y, canvasSize) && inBounds(yCenter + x, canvasSize)) {
+				canvas[xCenter - y][yCenter + x] = color;
+			}
+			if (inBounds(xCenter - x, canvasSize) && inBounds(yCenter - y, canvasSize)) {
+				canvas[xCenter - x][yCenter - y] = color;
+			}
+			if (inBounds(xCenter - y, canvasSize) && inBounds(yCenter - x, canvasSize)) {
+				canvas[xCenter - y][yCenter - x] = color;
+			}
+			if (inBounds(xCenter + x, canvasSize) && inBounds(yCenter - y, canvasSize)) {
+				canvas[xCenter + x][yCenter - y] = color;
+			}
+			if (inBounds(xCenter + y, canvasSize) && inBounds(yCenter - x, canvasSize)) {
+				canvas[xCenter + y][yCenter - x] = color;
+			}
+
+			if (err <= 0) {
+				y += 1;
+				err += 2 * y + 1;
+			}
+
+			if (err > 0) {
+				x -= 1;
+				err -= 2 * x + 1;
+			}
+		}
+	}
+
+	static void drawThickCircle(rgb_data color, int canvasSize, int xCenter, int yCenter, int radius, rgb_data ** canvas, bool first = true) {
+		int x = radius;
+		int y = 0;
+		int err = 0;
+		while (x >= y) {
+			//if x&y are not out of bounds, draw circle
+
+			if (inBounds(xCenter + x, canvasSize) && inBounds(yCenter + y, canvasSize)) {
+				canvas[xCenter + x][yCenter + y] = color;
+			}
+			if (inBounds(xCenter + y, canvasSize) && inBounds(yCenter + x, canvasSize)) {
+				canvas[xCenter + y][yCenter + x] = color;
+			}
+			if (inBounds(xCenter - x, canvasSize) && inBounds(yCenter + y, canvasSize)) {
+				canvas[xCenter - x][yCenter + y] = color;
+			}
+			if (inBounds(xCenter - y, canvasSize) && inBounds(yCenter + x, canvasSize)) {
+				canvas[xCenter - y][yCenter + x] = color;
+			}
+			if (inBounds(xCenter - x, canvasSize) && inBounds(yCenter - y, canvasSize)) {
+				canvas[xCenter - x][yCenter - y] = color;
+			}
+			if (inBounds(xCenter - y, canvasSize) && inBounds(yCenter - x, canvasSize)) {
+				canvas[xCenter - y][yCenter - x] = color;
+			}
+			if (inBounds(xCenter + x, canvasSize) && inBounds(yCenter - y, canvasSize)) {
+				canvas[xCenter + x][yCenter - y] = color;
+			}
+			if (inBounds(xCenter + y, canvasSize) && inBounds(yCenter - x, canvasSize)) {
+				canvas[xCenter + y][yCenter - x] = color;
+			}
+
+			if (err <= 0) {
+				y += 1;
+				err += 2 * y + 1;
+			}
+
+			if (err > 0) {
+				x -= 1;
+				err -= 2 * x + 1;
+			}
+		}
+		if (first) {
+			drawThickCircle(color, canvasSize, xCenter, yCenter, radius - 1, canvas, false);
+		}
+	}
+
+	static void drawFilledCircle(rgb_data color, int canvasSize, int xCenter, int yCenter, int radius, rgb_data ** canvas) {
+		int x = radius;
+		int y = 0;
+		int err = 0;
+		while (x >= y) {
+			//if x&y are not out of bounds, draw circle
+
+			if (inBounds(xCenter + x, canvasSize) && inBounds(yCenter + y, canvasSize)) {
+				canvas[xCenter + x][yCenter + y] = color;
+			}
+			if (inBounds(xCenter + y, canvasSize) && inBounds(yCenter + x, canvasSize)) {
+				canvas[xCenter + y][yCenter + x] = color;
+			}
+			if (inBounds(xCenter - x, canvasSize) && inBounds(yCenter + y, canvasSize)) {
+				canvas[xCenter - x][yCenter + y] = color;
+			}
+			if (inBounds(xCenter - y, canvasSize) && inBounds(yCenter + x, canvasSize)) {
+				canvas[xCenter - y][yCenter + x] = color;
+			}
+			if (inBounds(xCenter - x, canvasSize) && inBounds(yCenter - y, canvasSize)) {
+				canvas[xCenter - x][yCenter - y] = color;
+			}
+			if (inBounds(xCenter - y, canvasSize) && inBounds(yCenter - x, canvasSize)) {
+				canvas[xCenter - y][yCenter - x] = color;
+			}
+			if (inBounds(xCenter + x, canvasSize) && inBounds(yCenter - y, canvasSize)) {
+				canvas[xCenter + x][yCenter - y] = color;
+			}
+			if (inBounds(xCenter + y, canvasSize) && inBounds(yCenter - x, canvasSize)) {
+				canvas[xCenter + y][yCenter - x] = color;
+			}
+
+			if (err <= 0) {
+				y += 1;
+				err += 2 * y + 1;
+			}
+
+			if (err > 0) {
+				x -= 1;
+				err -= 2 * x + 1;
+			}
+		}
+
+		if (radius <= 0) {
+			canvas[xCenter][yCenter] = color;
+		}
+		else {
+			drawFilledCircle(color, canvasSize, xCenter, yCenter, radius - 1, canvas);
+		}
+	}
+
 	static void drawRectangle(rgb_data color, int x1, int y1, int x2, int y2, bool fill, rgb_data ** canvas) {
 		int swap = 0;
 		if (x1 < x2 && y1 > y2) {
@@ -102,6 +244,28 @@ public:
 				drawLine(color, x1, y1 + i, x2, y1 + i, canvas);
 			}
 		}
+	}
+
+	static int checkBounds(int coord, int canvasSize)
+	{
+		if (coord > canvasSize - 1) {
+			return canvasSize - 1;
+		}
+		if (coord < 0) {
+			return 0;
+		}
+		return coord;
+	}
+
+	static bool inBounds(int coord, int canvasSize)
+	{
+		if (coord > canvasSize - 1) {
+			return false;
+		}
+		if (coord < 0) {
+			return false;
+		}
+		return true;
 	}
 };
 
