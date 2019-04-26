@@ -81,28 +81,28 @@ public:
 			//if x&y are not out of bounds, draw circle
 			
 			if (inBounds(xCenter + x, canvasSize) && inBounds(yCenter + y, canvasSize)) {
-				canvas[xCenter + x][yCenter + y] = color;
+				canvas[xCenter + x][yCenter + y] = Color::mixAlpha(canvas[xCenter + x][yCenter + y], color);
 			}
 			if (inBounds(xCenter + y, canvasSize) && inBounds(yCenter + x, canvasSize)) {
-				canvas[xCenter + y][yCenter + x] = color;
+				canvas[xCenter + y][yCenter + x] = Color::mixAlpha(canvas[xCenter + y][yCenter + x], color);
 			}
 			if (inBounds(xCenter - x, canvasSize) && inBounds(yCenter + y, canvasSize)) {
-				canvas[xCenter - x][yCenter + y] = color;
+				canvas[xCenter - x][yCenter + y] = Color::mixAlpha(canvas[xCenter - x][yCenter + y], color);
 			}
 			if (inBounds(xCenter - y, canvasSize) && inBounds(yCenter + x, canvasSize)) {
-				canvas[xCenter - y][yCenter + x] = color;
+				canvas[xCenter - y][yCenter + x] = Color::mixAlpha(canvas[xCenter - y][yCenter + x], color);
 			}
 			if (inBounds(xCenter - x, canvasSize) && inBounds(yCenter - y, canvasSize)) {
-				canvas[xCenter - x][yCenter - y] = color;
+				canvas[xCenter - x][yCenter - y] = Color::mixAlpha(canvas[xCenter - x][yCenter - y], color);
 			}
 			if (inBounds(xCenter - y, canvasSize) && inBounds(yCenter - x, canvasSize)) {
-				canvas[xCenter - y][yCenter - x] = color;
+				canvas[xCenter - y][yCenter - x] = Color::mixAlpha(canvas[xCenter - y][yCenter - x], color);
 			}
 			if (inBounds(xCenter + x, canvasSize) && inBounds(yCenter - y, canvasSize)) {
-				canvas[xCenter + x][yCenter - y] = color;
+				canvas[xCenter + x][yCenter - y] = Color::mixAlpha(canvas[xCenter + x][yCenter - y], color);
 			}
 			if (inBounds(xCenter + y, canvasSize) && inBounds(yCenter - x, canvasSize)) {
-				canvas[xCenter + y][yCenter - x] = color;
+				canvas[xCenter + y][yCenter - x] = Color::mixAlpha(canvas[xCenter + y][yCenter - x], color);
 			}
 
 			if (err <= 0) {
@@ -125,28 +125,28 @@ public:
 			//if x&y are not out of bounds, draw circle
 
 			if (inBounds(xCenter + x, canvasSize) && inBounds(yCenter + y, canvasSize)) {
-				canvas[xCenter + x][yCenter + y] = color;
+				canvas[xCenter + x][yCenter + y] = Color::mixAlpha(canvas[xCenter + x][yCenter + y], color);
 			}
 			if (inBounds(xCenter + y, canvasSize) && inBounds(yCenter + x, canvasSize)) {
-				canvas[xCenter + y][yCenter + x] = color;
+				canvas[xCenter + y][yCenter + x] = Color::mixAlpha(canvas[xCenter + y][yCenter + x], color);
 			}
 			if (inBounds(xCenter - x, canvasSize) && inBounds(yCenter + y, canvasSize)) {
-				canvas[xCenter - x][yCenter + y] = color;
+				canvas[xCenter - x][yCenter + y] = Color::mixAlpha(canvas[xCenter - x][yCenter + y], color);
 			}
 			if (inBounds(xCenter - y, canvasSize) && inBounds(yCenter + x, canvasSize)) {
-				canvas[xCenter - y][yCenter + x] = color;
+				canvas[xCenter - y][yCenter + x] = Color::mixAlpha(canvas[xCenter - y][yCenter + x], color);
 			}
 			if (inBounds(xCenter - x, canvasSize) && inBounds(yCenter - y, canvasSize)) {
-				canvas[xCenter - x][yCenter - y] = color;
+				canvas[xCenter - x][yCenter - y] = Color::mixAlpha(canvas[xCenter - x][yCenter - y], color);
 			}
 			if (inBounds(xCenter - y, canvasSize) && inBounds(yCenter - x, canvasSize)) {
-				canvas[xCenter - y][yCenter - x] = color;
+				canvas[xCenter - y][yCenter - x] = Color::mixAlpha(canvas[xCenter - y][yCenter - x], color);
 			}
 			if (inBounds(xCenter + x, canvasSize) && inBounds(yCenter - y, canvasSize)) {
-				canvas[xCenter + x][yCenter - y] = color;
+				canvas[xCenter + x][yCenter - y] = Color::mixAlpha(canvas[xCenter + x][yCenter - y], color);
 			}
 			if (inBounds(xCenter + y, canvasSize) && inBounds(yCenter - x, canvasSize)) {
-				canvas[xCenter + y][yCenter - x] = color;
+				canvas[xCenter + y][yCenter - x] = Color::mixAlpha(canvas[xCenter + y][yCenter - x], color);
 			}
 
 			if (err <= 0) {
@@ -163,6 +163,7 @@ public:
 			drawThickCircle(color, canvasSize, xCenter, yCenter, radius - 1, canvas, false);
 		}
 	}
+
 
 	static void drawFilledCircle(rgb_data color, int canvasSize, int xCenter, int yCenter, int radius, rgb_data ** canvas) {
 		int x = radius;
@@ -212,6 +213,60 @@ public:
 		}
 		else {
 			drawFilledCircle(color, canvasSize, xCenter, yCenter, radius - 1, canvas);
+		}
+	}
+
+	static void drawDecreasingCircle(rgb_data color, int canvasSize, int xCenter, int yCenter, int radius, rgb_data ** canvas, bool first = true) {
+		int x = radius;
+		int y = 0;
+		int err = 0;
+		while (x >= y) {
+			//if x&y are not out of bounds, draw circle
+
+			if (inBounds(xCenter + x, canvasSize) && inBounds(yCenter + y, canvasSize)) {
+				canvas[xCenter + x][yCenter + y] = color;
+			}
+			if (inBounds(xCenter + y, canvasSize) && inBounds(yCenter + x, canvasSize)) {
+				canvas[xCenter + y][yCenter + x] = color;
+			}
+			if (inBounds(xCenter - x, canvasSize) && inBounds(yCenter + y, canvasSize)) {
+				canvas[xCenter - x][yCenter + y] = color;
+			}
+			if (inBounds(xCenter - y, canvasSize) && inBounds(yCenter + x, canvasSize)) {
+				canvas[xCenter - y][yCenter + x] = color;
+			}
+			if (inBounds(xCenter - x, canvasSize) && inBounds(yCenter - y, canvasSize)) {
+				canvas[xCenter - x][yCenter - y] = color;
+			}
+			if (inBounds(xCenter - y, canvasSize) && inBounds(yCenter - x, canvasSize)) {
+				canvas[xCenter - y][yCenter - x] = color;
+			}
+			if (inBounds(xCenter + x, canvasSize) && inBounds(yCenter - y, canvasSize)) {
+				canvas[xCenter + x][yCenter - y] = color;
+			}
+			if (inBounds(xCenter + y, canvasSize) && inBounds(yCenter - x, canvasSize)) {
+				canvas[xCenter + y][yCenter - x] = color;
+			}
+
+			if (err <= 0) {
+				y += 1;
+				err += 2 * y + 1;
+			}
+
+			if (err > 0) {
+				x -= 1;
+				err -= 2 * x + 1;
+			}
+		}
+
+		if (first) {
+			drawDecreasingCircle(color, canvasSize, xCenter, yCenter, radius - 1, canvas, false);
+		}
+		else if (radius <= 2) {
+			; //do nothing, base case
+		}
+		else {
+			drawDecreasingCircle(color, canvasSize, xCenter, yCenter, radius - ((rand() % 8) + 1), canvas);
 		}
 	}
 

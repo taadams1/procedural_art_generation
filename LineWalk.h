@@ -64,7 +64,7 @@ public:
 	{
 		//seed for generator
 		std::random_device rndm;
-		//seeded mersenne twister generater
+		//seeded mersenne twister generator
 		std::mt19937 gen(rndm());
 		//range  distribution in which to generate integers
 		std::uniform_int_distribution<> dist(-shiftBy, shiftBy);

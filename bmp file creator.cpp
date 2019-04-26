@@ -15,9 +15,10 @@
 #include "RandomPixels.h"
 #include "LineWalk.h"
 #include "CirclePacking.h"
+#include "CircleWalk.h"
 
 const rgb_data WHITE{ 255, 255, 255, 255 };
-const rgb_data BLACK = { 0, 0, 0, 0 };
+const rgb_data BLACK = { 0, 0, 0, 255 };
 const rgb_data RED = { 255, 0, 0, 255 };
 const rgb_data GREEN = { 0, 255, 0, 255 };
 const rgb_data BLUE = { 0, 0, 255, 255 };
@@ -487,6 +488,197 @@ void runTest12() {
 	}
 }
 
+void runTest13() {
+
+	int width = 1024;
+	int height = 1024;
+
+	int shift = 2;
+	int radius = 50;
+	int iterations = 200;
+
+	for (int i = 0; i < 5; i++) {
+
+		struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+		for (int y = 0; y < width; y++) {
+			for (int x = 0; x < height; x++) {
+				pixels[x][y] = WHITE;
+			}
+		}
+
+		pixels = CircleWalk::circleWalk( width * 0.25, height * 0.25, radius , width, shift, iterations, pixels);
+
+		pixels = CircleWalk::circleWalk( width * 0.75, height * 0.25, radius, width, shift, iterations, pixels);
+
+		pixels = CircleWalk::circleWalk(width * 0.25, height * 0.75, radius, width, shift, iterations, pixels);
+
+		pixels = CircleWalk::circleWalk(width * 0.75, height * 0.75, radius, width, shift, iterations, pixels);
+
+		std::string filestring = "Circle_Walk_" + to_string(i + 1) + ".bmp";
+
+		const char *filename = filestring.c_str();
+
+		save_bitmap(filename, width, height, pixels);
+
+		shift *= 2;
+		iterations *= 2;
+	}
+
+}
+
+void runTest14() {
+
+	int width = 1024;
+	int height = 1024;
+
+	int shift = 2;
+	int radius = 50;
+	int iterations = 200;
+
+	for (int i = 0; i < 5; i++) {
+
+		struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+		for (int y = 0; y < width; y++) {
+			for (int x = 0; x < height; x++) {
+				pixels[x][y] = WHITE;
+			}
+		}
+
+		int lines[2][4] = { {width * 0.25, height * 0.25, width * 0.75, height * 0.75 },{width * 0.75, height * 0.25, width * 0.25, height * 0.75} };
+
+		pixels = LineWalk::lineWalk(lines, width, shift/2, iterations, pixels);
+
+		pixels = CircleWalk::circleWalk(width * 0.25, height * 0.25, radius, width, shift, iterations, pixels);
+
+		pixels = CircleWalk::circleWalk(width * 0.75, height * 0.25, radius, width, shift, iterations, pixels);
+
+		pixels = CircleWalk::circleWalk(width * 0.25, height * 0.75, radius, width, shift, iterations, pixels);
+
+		pixels = CircleWalk::circleWalk(width * 0.75, height * 0.75, radius, width, shift, iterations, pixels);
+
+		pixels = CircleWalk::circleWalk(width * 0.5, height * 0.5, radius * 1.5, width, shift, iterations, pixels);
+
+		std::string filestring = "Circle_Cross_" + to_string(i + 1) + ".bmp";
+
+		const char *filename = filestring.c_str();
+
+		save_bitmap(filename, width, height, pixels);
+
+		shift *= 2;
+		iterations *= 2;
+	}
+
+}
+
+void runTest15()
+{
+	int width = 1024;
+	int height = 1024;
+
+	struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+	//gradient type noise
+	for (int y = 0; y < width; y++) {
+		for (int x = 0; x < height; x++) {
+			pixels[x][y].r = 255 * tan(y);
+			pixels[x][y].g = (height % (y + 1));
+			pixels[x][y].b = 255 * sin(y);
+			pixels[x][y].a = 255;
+		}
+	}
+
+	save_bitmap("GradientTest1.bmp", width, height, pixels);
+
+	pixels = getBlankCanvas(width, height);
+
+	//gradient type noise
+	for (int y = 0; y < width; y++) {
+		for (int x = 0; x < height; x++) {
+			pixels[x][y].r = (height % (y + 1));
+			pixels[x][y].g = 255 * sin(y);
+			pixels[x][y].b = 255 * cos(x);
+			pixels[x][y].a = 255;
+		}
+	}
+
+	save_bitmap("GradientTest2.bmp", width, height, pixels);
+
+	pixels = getBlankCanvas(width, height);
+
+	//gradient type noise
+	for (int y = 0; y < width; y++) {
+		for (int x = 0; x < height; x++) {
+			pixels[x][y].r = x;
+			pixels[x][y].g = 255 % width * y;
+			pixels[x][y].b = 255 % width * x;
+			pixels[x][y].a = 255;
+		}
+	}
+
+	save_bitmap("GradientTest3.bmp", width, height, pixels);
+
+}
+
+void runTest16() {
+	int width = 1024;
+	int height = 1024;
+
+	struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+	for (int y = 0; y < width; y++) {
+		for (int x = 0; x < height; x++) {
+			pixels[x][y] = WHITE;
+		}
+	}
+
+	Draw::drawDecreasingCircle(BLACK, width, width / 2, height/2, width * 0.4,pixels);
+
+	save_bitmap("DecreasingCircleTest.bmp", width, height, pixels);
+}
+
+void runTest17() {
+	int width = 1024;
+	int height = 1024;
+
+	struct rgb_data ** pixels = getBlankCanvas(width, height);
+
+	for (int y = 0; y < width; y++) {
+		for (int x = 0; x < height; x++) {
+			pixels[x][y].r = x / 4;
+			pixels[x][y].g = 255 - x / 4;
+			pixels[x][y].b = 255 - y / 4;
+			pixels[x][y].a = 255;
+		}
+	}
+
+	Draw::drawDecreasingCircle(BLACK, width, width * 0.25, height * 0.25, width * 0.2, pixels);
+	Draw::drawDecreasingCircle(BLACK, width, width * 0.75, height * 0.25, width * 0.2, pixels);
+	Draw::drawDecreasingCircle(BLACK, width, width * 0.25, height * 0.75, width * 0.2, pixels);
+	Draw::drawDecreasingCircle(BLACK, width, width * 0.75, height * 0.75, width * 0.2, pixels);
+
+	save_bitmap("DecreasingCircleX4_Gradient.bmp", width, height, pixels);
+}
+
+void runDemo()
+{
+	//options for canvas
+	//color, pixels, gradient, etc
+	cout << "Canvas options:" << endl;
+	cout << "\t[1] Blank (White)" << endl;
+	cout << "\t[2] Blank (Black)" << endl;
+	cout << "\t[3] Random Color" << endl;
+	cout << "\t[4] Gradient" << endl;
+	//cout << "\t[5] Blank (White)" << endl;
+	//cout << "\t[1] Blank (White)" << endl;
+
+	//options for type of drawing
+		//color, iterations, coords, etc
+	//filename
+	//draw more, new image, quit
+}
+
 //The main function; used for manipulating the canvas and directing the program.
 int main() {
 
@@ -509,10 +701,16 @@ int main() {
 		cout << "\t[10]: Circle Packing Test" << endl;
 		cout << "\t[11]: Filled Circle Packing Test" << endl << "\t\t^^^Warning: Very Slow!" << endl;
 		cout << "\t[12]: Fractal Squares With Circles" << endl;
+		cout << "\t[13]: Circle Walk" << endl;
+		cout << "\t[14]: Circle With Crossed Lines" << endl;
+		cout << "\t[15]: Gradient Tests" << endl;
+		cout << "\t[16]: Decreasing Circle Test" << endl;
+		cout << "\t[17]: Decreasing Circle * 4 Test" << endl;
+
 
 		cout << endl << "Please enter the number of a choice above: ";
 		cin >> input;
-		if (input > 12 || input < 0) {
+		if (input > 17 || input < 0) {
 			cout << "Invalid input; please try again.";
 			input = -1;
 		}
@@ -569,6 +767,26 @@ int main() {
 		case 12:
 			cout << endl << "Running Fractal with Circle test" << endl;
 			runTest12();
+			break;
+		case 13:
+			cout << endl << "Running Circle Walk" << endl;
+			runTest13();
+			break;
+		case 14:
+			cout << endl << "Running Circle Walk with Crossed Lines" << endl;
+			runTest14();
+			break;
+		case 15:
+			cout << endl << "Running Gradient Tests" << endl;
+			runTest15();
+			break;
+		case 16:
+			cout << endl << "Running Decresing Circle Test" << endl;
+			runTest16();
+			break;
+		case 17:
+			cout << endl << "Running Decresing Circle * 4 Test" << endl;
+			runTest17();
 			break;
 		default:
 			break;

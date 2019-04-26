@@ -17,9 +17,9 @@ class CirclePacking
 private:
 	
 	static const int MIN_RADIUS = 3;
-	static const int MAX_RADIUS = 200;
+	static const int MAX_RADIUS = 180;
 	static const int TOTAL_CIRCLES = 2200;
-	static const int ATTEMPTS = 5000;
+	static const int ATTEMPTS = 4000;
 	static std::vector<circle> circles;
 public:
 	static rgb_data ** packCircles(int, rgb_data, rgb_data **);
